@@ -48,7 +48,7 @@ const UpdateProduct = () => {
   };
 
   return (
-    <div className="container mt-8">
+    <div className="container mx-auto mt-8">
       <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
       <form className="max-w-md">
         <div className="mb-4">

@@ -1,9 +1,11 @@
 // InventoryComponent.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import {Link} from 'react-router-dom'
+import axios from '../axios';
+import {Link,useNavigate} from 'react-router-dom'
 
 const InventoryComponent = () => {
+  const navigate=useNavigate()
+  let token;
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     productName: '',
@@ -13,7 +15,11 @@ const InventoryComponent = () => {
 
   useEffect(() => {
     // Fetch all products
-    axios.get('http://localhost:8080/allProducts')
+    token=localStorage.getItem('token')
+    if(token==null){
+      navigate('/signin')
+    }
+    axios.get('/auth/allProducts')
       .then(response => {
         // console.log(response.data);
         setProducts(response.data)
@@ -34,7 +40,7 @@ const InventoryComponent = () => {
   const addProduct = () => {
     // Create a new product
     console.log(newProduct);
-    axios.post('http://localhost:8080/createProduct', newProduct, { headers: { 'Content-Type': 'application/json' } })
+    axios.post('/auth/createProduct', newProduct, { headers: { 'Content-Type': 'application/json' } })
       .then(response => {
         // console.log(response);
         setProducts([response.data.result,...products]);
@@ -47,14 +53,22 @@ const InventoryComponent = () => {
   const deleteProduct = (id) => {
     // Delete a product
     // console.log(id);
-    axios.delete(`http://localhost:8080/deleteProduct/${id}`)
+    axios.delete(`/auth/deleteProduct/${id}`)
       .then(() => setProducts(products.filter(product => product.id !== id)))
       .catch(error => console.error(error));
+  };
+
+  const logout = () => {
+    // Remove the token from local storage
+    localStorage.removeItem('token');
+    // Redirect the user to the signing page
+    navigate('/signin');
   };
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-4">Inventory Management</h1>
+      <button onClick={logout} className="bg-red-500 text-white p-2 rounded cursor-pointer mb-4">Logout</button>
       <div className="mb-8">
         <label className="block mb-2" htmlFor="productName">Product Name</label>
         <input
@@ -85,7 +99,7 @@ const InventoryComponent = () => {
       <div>
         <h2 className="text-2xl font-bold mb-4">Product List</h2>
         <ul>
-          {products.map(product => (
+          {products && products.map(product => (
             <li key={product.id} className="border p-4 mb-4 rounded">
               <div>{product.productName} - {product.units} units - ${product.price}</div>
               <button onClick={() => deleteProduct(product.id)} className="mt-2 bg-red-500 text-white p-2 rounded cursor-pointer">Delete</button>
