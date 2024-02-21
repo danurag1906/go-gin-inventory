@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
     const navigate=useNavigate()
@@ -19,7 +19,7 @@ const SignUp = () => {
    const handleSignup = () => {
       axios.post('http://localhost:8080/signup', user)
          .then(response => {
-            console.log(response);
+            // console.log(response);
             if(response.status==201){
                 navigate("/signin")
             }
@@ -31,7 +31,7 @@ const SignUp = () => {
    return (
       <div className="container mx-auto mt-8">
          <h2 className="text-2xl font-bold mb-4">Signup</h2>
-         <form className="max-w-md">
+         <form className=" container mx-auto max-w-md">
             <div className="mb-4">
                <label htmlFor="username" className="block text-sm font-medium text-gray-600">Username:</label>
                <input
@@ -61,6 +61,7 @@ const SignUp = () => {
             >
                Signup
             </button>
+            <p>Have an account ? <Link to={'/signin'}  className='text-blue-700 font-bold' >SignIn</Link></p>
          </form>
       </div>
    );

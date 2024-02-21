@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const UpdateProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state: user } = useAuth();
 
   const [editedProduct, setEditedProduct] = useState({
     productName: "",
@@ -13,15 +15,25 @@ const UpdateProduct = () => {
   });
 
   useEffect(() => {
+    let token = localStorage.getItem("token");
+
+    if (!user.token) {
+      navigate("/signin");
+    }
+
     // Fetch data for the specific item with the given id
     axios
-      .get(`http://localhost:8080/products/${id}`)
+      .get(`http://localhost:8080/auth/products/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         // Update the state with the fetched data
         setEditedProduct(response.data);
       })
       .catch((error) => console.error(error));
-  }, [id]);
+  }, [id, user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,11 +50,18 @@ const UpdateProduct = () => {
 
   const handleUpdateProduct = () => {
     // Update the product with the edited details
+    const token = localStorage.getItem("token");
     axios
-      .put(`http://localhost:8080/updateProduct/${id}`, editedProduct)
+      .put(`http://localhost:8080/auth/updateProduct/${id}`, editedProduct, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         // Redirect back to the main page after successful update
-        navigate("/")
+        if (response.status == 200) {
+          navigate("/home");
+        }
       })
       .catch((error) => console.error(error));
   };
@@ -52,7 +71,10 @@ const UpdateProduct = () => {
       <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
       <form className="max-w-md">
         <div className="mb-4">
-          <label htmlFor="productName" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="productName"
+            className="block text-sm font-medium text-gray-600"
+          >
             Product Name:
           </label>
           <input
@@ -65,7 +87,10 @@ const UpdateProduct = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="units" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="units"
+            className="block text-sm font-medium text-gray-600"
+          >
             Units:
           </label>
           <input
@@ -78,7 +103,10 @@ const UpdateProduct = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="price" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="price"
+            className="block text-sm font-medium text-gray-600"
+          >
             Price:
           </label>
           <input

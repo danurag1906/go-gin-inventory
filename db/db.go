@@ -5,13 +5,23 @@ import (
 	"log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
+	"github.com/joho/godotenv"
 )
 
 var Client *mongo.Client
 
 func Init() {
 	// Connect to MongoDB
-	clientOptions := options.Client().ApplyURI("mongodb+srv://gogin-inventory:gogin-inventory@cluster0.jdnkx7w.mongodb.net/?retryWrites=true&w=majority")
+
+	// Load the .env file
+    if err := godotenv.Load(); err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+	databaseURL:=os.Getenv("MONGO_CONN_URL")
+
+	clientOptions := options.Client().ApplyURI(databaseURL)
 	var err error
 	Client, err = mongo.Connect(context.Background(), clientOptions)
 	if err != nil {

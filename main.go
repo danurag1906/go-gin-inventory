@@ -10,12 +10,6 @@ import (
 
 var client *mongo.Client
 
-const (
-	ConnectionString ="mongodb+srv://gogin-inventory:gogin-inventory@cluster0.jdnkx7w.mongodb.net/?retryWrites=true&w=majority"
-	DbName="go-inventory"
-	CollectionName="inventory"
-)
-
 
 func main(){
 	db.Init()
